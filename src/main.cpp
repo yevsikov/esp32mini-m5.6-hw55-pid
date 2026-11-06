@@ -3,7 +3,8 @@
 #define POT_PIN 7
 #define LDR_PIN 9
 
-
+const int PWM_BASE = 128;
+const float PID_KP = 0.03;
 
 void setup() {
   Serial.begin(115200);
@@ -30,8 +31,25 @@ void loop() {
   Serial.print(setpoint);
   Serial.print(" | LDR: ");
   Serial.print(ldrValue);
+
+
+  float pwmValue = PWM_BASE + PID_KP * error;
+
+  if (pwmValue < 0) {
+    pwmValue = 0;
+  }
+  if (pwmValue > 255) {
+    pwmValue = 255;
+  }
+
+  int pwmOutput = (int)pwmValue;
+  analogWrite(LED_PIN, pwmOutput);
+
+  
   Serial.print(" | ERROR: ");
-  Serial.println(error);
+  Serial.print(error);
+  Serial.print(" | PWM: ");
+  Serial.println(pwmOutput);
 
   delay(500);
 }
