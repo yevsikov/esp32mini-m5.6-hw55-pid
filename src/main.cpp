@@ -6,6 +6,10 @@
 const int PWM_BASE = 0;
 const float PID_KP = 0.01;
 const float PID_KI = 0.001;
+const float PID_KD = 0.00001;
+
+int previousLdr = 0;
+bool hasPreviousLdr = false;
 
 float iCorrection = 0.0;
 unsigned long previousTime = 0;
@@ -48,7 +52,25 @@ void loop() {
   float dtSeconds = (currentTime - previousTime) / 1000.0;
   previousTime = currentTime;
 
+  float dCorrection = 0.0;
+
+  if (hasPreviousLdr && dtSeconds > 0) {
+    float ldrRate = (ldrValue - previousLdr) / dtSeconds;
+    dCorrection = -PID_KD * ldrRate;
+  }
+
+  previousLdr = ldrValue;
+  hasPreviousLdr = true;
+
+  // iCorrection += PID_KI * error * dtSeconds;
+  float pwmBeforeIntegration =
+    PWM_BASE + PID_KP * error + iCorrection + dCorrection;
+
+if ((pwmBeforeIntegration > 0 && pwmBeforeIntegration < 255) ||
+    (pwmBeforeIntegration <= 0 && error > 0) ||
+    (pwmBeforeIntegration >= 255 && error < 0)) {
   iCorrection += PID_KI * error * dtSeconds;
+}
 
   if (iCorrection > 30.0) {
     iCorrection = 30.0;
@@ -57,7 +79,7 @@ void loop() {
     iCorrection = -30.0;
   }
 
-  float pwmValue = PWM_BASE + PID_KP * error + iCorrection;
+  float pwmValue = PWM_BASE + PID_KP * error + iCorrection + dCorrection;
 
   if (pwmValue < 0) {
     pwmValue = 0;
@@ -74,6 +96,8 @@ void loop() {
   Serial.print(error);
   Serial.print(" | I: ");
   Serial.print(iCorrection, 2);
+  Serial.print(" | D: ");
+  Serial.print(dCorrection, 2);
   Serial.print(" | PWM: ");
   Serial.println(pwmOutput);
 
