@@ -10,7 +10,7 @@ void setup() {
   Serial.println("--- Ініціалізація GPIO ---");
 
   pinMode(LED_PIN, OUTPUT);
-  digitalWrite(LED_PIN, LOW);
+  analogWrite(LED_PIN, 128);
 
   pinMode(POT_PIN, INPUT);
   analogSetPinAttenuation(POT_PIN, ADC_11db);
@@ -21,21 +21,18 @@ void setup() {
 }
 
 void loop() {
-  Serial.println("ESP32 is alive!");
-
-  digitalWrite(LED_PIN, HIGH);
-  delay(1000);
-  digitalWrite(LED_PIN, LOW);
-  delay(1000);
-
-
   int potValue = analogRead(POT_PIN);
-  Serial.print("Potentiometer value: ");
-  Serial.println(potValue);
+  int setpoint = potValue;
+  int ldrValue = analogRead(LDR_PIN);
+  int error = setpoint - ldrValue;
 
-    int ldrValue = analogRead(LDR_PIN); // Read the value from the LDR sensor
-    Serial.print("LDR value: ");
-    Serial.println(ldrValue);
+  Serial.print("TARGET: ");
+  Serial.print(setpoint);
+  Serial.print(" | LDR: ");
+  Serial.print(ldrValue);
+  Serial.print(" | ERROR: ");
+  Serial.println(error);
 
+  delay(500);
 }
 
