@@ -52,3 +52,8 @@ GPIO5 ───[220Ω]───|>|────────────── GND
 
 If GIF preview is not displayed in your viewer, open it directly: [result.gif](./result.gif)
 
+
+## Charts
+
+![Charts](./charts.png)
+
