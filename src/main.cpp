@@ -6,7 +6,7 @@
 const int PWM_BASE = 0;
 const float PID_KP = 0.01;
 const float PID_KI = 0.001;
-const float PID_KD = 0.00001;
+const float PID_KD = 0;
 
 int previousLdr = 0;
 bool hasPreviousLdr = false;
